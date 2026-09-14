@@ -47,8 +47,8 @@ impl Shape for Ubl {
     }
 
     fn shape(&self, stream: &Stream) -> Result<Shaped, ShapeError> {
-        let root = root::document(stream.bytes())
-            .map_err(|(reason, at)| ShapeError::new("ubl", reason).at(at))?;
+        let root =
+            root::document(stream.bytes()).map_err(|stop| ShapeError::refused("ubl", stop))?;
         let Some(document_type) = document_type(&root) else {
             return Err(
                 ShapeError::new("ubl", "the root element is not in a UBL 2 namespace")
