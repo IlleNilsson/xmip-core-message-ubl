@@ -128,7 +128,7 @@ xmlns:cbc=\"urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2
     #[test]
     fn the_shape_claims_no_media_type_and_recognises_a_ubl_root() {
         assert_eq!(Ubl.technology(), "ubl");
-        assert!(Ubl.media_types().is_empty());
+        assert_eq!(Ubl.media_types(), [] as [&str; 0]);
         assert!(Ubl.recognises(INVOICE));
         assert!(!Ubl.recognises(b"<Invoice/>"));
         assert!(!Ubl.recognises(b"{\"type\": \"Invoice\"}"));
