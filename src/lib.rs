@@ -42,7 +42,7 @@ impl Shape for Ubl {
         &[]
     }
 
-    fn recognises(&self, bytes: &[u8]) -> bool {
+    fn recognizes(&self, bytes: &[u8]) -> bool {
         root::document(bytes).is_ok_and(|root| document_type(&root).is_some())
     }
 
@@ -126,12 +126,12 @@ xmlns:cbc=\"urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2
     }
 
     #[test]
-    fn the_shape_claims_no_media_type_and_recognises_a_ubl_root() {
+    fn the_shape_claims_no_media_type_and_recognizes_a_ubl_root() {
         assert_eq!(Ubl.technology(), "ubl");
         assert_eq!(Ubl.media_types(), [] as [&str; 0]);
-        assert!(Ubl.recognises(INVOICE));
-        assert!(!Ubl.recognises(b"<Invoice/>"));
-        assert!(!Ubl.recognises(b"{\"type\": \"Invoice\"}"));
+        assert!(Ubl.recognizes(INVOICE));
+        assert!(!Ubl.recognizes(b"<Invoice/>"));
+        assert!(!Ubl.recognizes(b"{\"type\": \"Invoice\"}"));
     }
 
     #[test]
