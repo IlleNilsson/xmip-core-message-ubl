@@ -27,9 +27,7 @@ const NAMESPACE_PREFIX: &str = "urn:oasis:names:specification:ubl:schema:xsd:";
 /// namespace names too.
 fn document_type(root: &Root) -> Option<&str> {
     let namespace = root.namespace.as_deref()?;
-    let named = namespace
-        .strip_prefix(NAMESPACE_PREFIX)?
-        .strip_suffix("-2")?;
+    let named = namespace.strip_circumfix(NAMESPACE_PREFIX, "-2")?;
     (named == root.local_name).then_some(named)
 }
 
