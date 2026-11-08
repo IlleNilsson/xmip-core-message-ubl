@@ -45,8 +45,8 @@ impl Shape for Ubl {
     }
 
     fn shape(&self, stream: &Stream) -> Result<Shaped, ShapeError> {
-        let root =
-            root::document(stream.bytes()).map_err(|stop| ShapeError::refused("ubl", stop))?;
+        let bytes = message::loaded(self.technology(), stream)?;
+        let root = root::document(bytes).map_err(|stop| ShapeError::refused("ubl", stop))?;
         let Some(document_type) = document_type(&root) else {
             return Err(
                 ShapeError::new("ubl", "the root element is not in a UBL 2 namespace")
@@ -57,7 +57,7 @@ impl Shape for Ubl {
             .media_type()
             .map_or_else(|| "application/xml".to_string(), str::to_string);
         Ok(Shaped {
-            parts: vec![Part::new(None, stream.bytes(), Some(media))],
+            parts: vec![Part::new(None, bytes, Some(media))],
             message_type: Some(document_type.to_string()),
         })
     }
@@ -135,11 +135,12 @@ xmlns:cbc=\"urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2
     #[test]
     fn choose_takes_ubl_by_look_before_xml_and_leaves_other_xml_to_xml() {
         let shapes: [&dyn Shape; 2] = [&Ubl, &message_xml::Xml];
-        let ubl = message::choose(&shapes, &stream(INVOICE, None));
+        let ubl = message::choose(&shapes, &stream(INVOICE, None)).expect("held");
         assert_eq!(ubl.map(Shape::technology), Some("ubl"));
-        let xml = message::choose(&shapes, &stream(b"<a/>", None));
+        let xml = message::choose(&shapes, &stream(b"<a/>", None)).expect("held");
         assert_eq!(xml.map(Shape::technology), Some("xml"));
-        let by_media = message::choose(&shapes, &stream(INVOICE, Some("application/xml")));
+        let by_media =
+            message::choose(&shapes, &stream(INVOICE, Some("application/xml"))).expect("held");
         assert_eq!(by_media.map(Shape::technology), Some("xml"));
     }
 }
